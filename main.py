@@ -1,13 +1,34 @@
 import csv
 from bs4 import BeautifulSoup
 from selenium import webdriver
+from selenium.webdriver.common.by import By
+from selenium.webdriver.common.keys import Keys
 
 URL = 'https://www.amazon.com'
 
 
+def chrome_webdriver():
+    # keep chrome open after program finishes
+    chrome_options = webdriver.ChromeOptions()
+    chrome_options.add_experimental_option("detach", True)
+    # user_agent = fake_useragent()
+    # chrome_options.add_argument(f"user-agent={user_agent}")
+
+    # configure the webdriver
+    driver = webdriver.Chrome(options=chrome_options)
+
+    return driver
+
+
+def search_for_element(driver: chrome_webdriver):
+    search_bar = driver.find_element(By.ID, "e")
+    search_bar.send_keys("ultrawide monitor")
+    search_bar.send_keys(Keys.RETURN)
+
+
 def get_url(search_text: str):
     """Generate a url from search text"""
-    template = f'{URL}/s?k={{}}&ref=nb_sb_noss_1'
+    template = f'{URL}/s?k={{}}&ref=cs_503_search'
     search_term = search_text.replace(' ', '+')
 
     # add term query to url
@@ -52,17 +73,15 @@ def extract_record(item):
 def main(search_term):
     """Run main program routine"""
 
-    # keep chrome open after program finishes
-    chrome_options = webdriver.ChromeOptions()
-    chrome_options.add_experimental_option("detach", True)
-
-    # configure the webdriver
-    driver = webdriver.Chrome(options=chrome_options)
     records = []
     url = get_url(search_term)
+    driver = chrome_webdriver()
 
-    for page in range(1, 21):
+    for page in range(1, 5):
         driver.get(url.format(page))
+        if page == 1:
+            search_for_element(driver)
+
         soup = BeautifulSoup(driver.page_source, 'html.parser')
         results = soup.find_all('div', {'data-component-type': 's-search-result'})
         for item in results:
