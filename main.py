@@ -1,6 +1,8 @@
 import csv
+
 from bs4 import BeautifulSoup
 from selenium import webdriver
+from selenium.common.exceptions import *
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 
@@ -20,22 +22,28 @@ def chrome_webdriver():
     return driver
 
 
-def search_for_element(driver: chrome_webdriver):
+def search_for_product(driver: chrome_webdriver):
     search_bar = driver.find_element(By.ID, "e")
     search_bar.send_keys("ultrawide monitor")
     search_bar.send_keys(Keys.RETURN)
+
+
+def next_page(driver: chrome_webdriver):
+    try:
+        a_tag = driver.find_element(by=By.LINK_TEXT, value="Next")
+        url = f"{a_tag.get_attribute("href")}"
+        return url
+    except NoSuchElementException:
+        print("No More pages to scrap")
+        driver.close()
 
 
 def get_url(search_text: str):
     """Generate a url from search text"""
     template = f'{URL}/s?k={{}}&ref=cs_503_search'
     search_term = search_text.replace(' ', '+')
-
     # add term query to url
     url = template.format(search_term)
-
-    # add page query placeholder
-    url += '&page={}'
 
     return url
 
@@ -77,10 +85,12 @@ def main(search_term):
     url = get_url(search_term)
     driver = chrome_webdriver()
 
-    for page in range(1, 5):
-        driver.get(url.format(page))
-        if page == 1:
-            search_for_element(driver)
+    driver.get(url)
+    search_for_product(driver)
+
+    next_page_url = next_page(driver)
+
+    while next_page_url:
 
         soup = BeautifulSoup(driver.page_source, 'html.parser')
         results = soup.find_all('div', {'data-component-type': 's-search-result'})
@@ -89,15 +99,14 @@ def main(search_term):
             if record:
                 records.append(record)
 
-    driver.close()
+        # save data to csv file
+        with open('results.csv', 'w', newline='', encoding='utf-8') as f:
+            writer = csv.writer(f)
+            writer.writerow(['Description', 'Price', 'Rating', 'ReviewCount', 'Url'])
+            writer.writerows(records)
 
-    # save data to csv file
-    with open('results.csv', 'w', newline='', encoding='utf-8') as f:
-        writer = csv.writer(f)
-        writer.writerow(['Description', 'Price', 'Rating', 'ReviewCount', 'Url'])
-        writer.writerows(records)
-
-    # run the main program
+        driver.get(next_page_url)
+        next_page_url = next_page(driver)
 
 
 if __name__ == '__main__':
