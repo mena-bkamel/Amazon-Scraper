@@ -1,18 +1,24 @@
-**Project Title**
-**"E-commerce Product Scraper"**
+# E-commerce Product Scraper
 
 **Problem Statement**
-Shoppers often need detailed information about specific products, such as "Dell laptops," across multiple pages of an e-commerce site to make informed purchase decisions. Manually browsing and collecting this data is time-consuming and inefficient. This project addresses the issue by automating the data collection process, extracting essential details like product title, price, ratings, and reviews, and saving the information into a CSV file for easy analysis and comparison.
+
+Making informed purchase decisions often requires gathering detailed information about products across multiple pages of an e-commerce site. Manual data collection is time-consuming and prone to errors. This project aims to automate this process by efficiently scraping product details.
 
 **Key Features**
-Scrapes product details (title, price, rating, and number of reviews).
-Handles multiple pages automatically.
-Outputs data in a structured CSV file.
+
+* **Data Extraction:** Scrapes key product information (title, price, rating, reviews).
+* **Multi-Page Handling:** Automatically navigates and extracts data from multiple product pages.
+* **Data Output:** Outputs structured data in a CSV file for easy analysis.
+
 **Tools Used**
-Python
-Selenium
-BeautifulSoup
+
+* Python
+* Selenium
+* BeautifulSoup
+
 **How It Works**
-Takes a specific product (e.g., "Dell laptops") as input.
-Navigates through all product pages.
-Extracts relevant data and saves it to a CSV file
+
+1. **Input:** Accepts a target product (e.g., "Dell laptops") as input.
+2. **Web Navigation:** Navigates through the e-commerce website, traversing multiple product pages.
+3. **Data Extraction:** Extracts relevant product details using web scraping techniques.
+4. **Data Storage:** Saves the extracted data in a well-formatted CSV file.
